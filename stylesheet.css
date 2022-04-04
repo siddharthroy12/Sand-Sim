@@ -6,3 +6,9 @@
   margin: 0;
   text-size-adjust: none;
 }
+
+canvas {
+  width: 650px;
+  image-rendering: pixelated;
+}
+

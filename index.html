@@ -5,11 +5,19 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="stylesheet.css">
-    <title>Document</title>
+    <title>Sand Simulator</title>
 </head>
 <body>
-    <p>Hello World</p>
-    <script src="script.js">
-    </script>
+  <canvas id="canvas">
+  </canvas>
+  <div>
+    <button onclick="resetCanvas()">Reset</button>
+    <button onclick="changeCurrentBlock('SAND_BLOCK')">Sand</button>
+    <button onclick="changeCurrentBlock('WALL_BLOCK')">Wall</button>
+    <button onclick="changeCurrentBlock('WATER_BLOCK')">Water</button>
+    <button onclick="changeCurrentBlock('AIR_BLOCK')">Air</button>
+  </div>
+  <script src="script.js">
+  </script>
 </body>
 </html>
