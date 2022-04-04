@@ -3,6 +3,8 @@ const AIR_BLOCK = "AIR_BLOCK";
 const SAND_BLOCK = "SAND_BLOCK";
 const WALL_BLOCk = "WALL_BLOCK";
 const WATER_BLOCK = "WATER_BLOCK";
+const GRASS_BLOCK = "GRASS_BLOCK";
+const SEED_BLOCK = "SEED_BLOCK";
 
 const DIR_UP = "DIR_UP";
 const DIR_DOWN = "DIR_DOWN";
@@ -18,7 +20,9 @@ const BLOCK_COLORS = {
   AIR_BLOCK: "black",
   SAND_BLOCK: "yellow",
   WALL_BLOCK: "brown",
-  WATER_BLOCK: "blue"
+  WATER_BLOCK: "blue",
+  GRASS_BLOCK: "green",
+  SEED_BLOCK: "olive"
 }
 
 let mouseHold = false;
@@ -187,6 +191,28 @@ window.addEventListener('load', function() {
     return result;
   }
 
+  function updateGravityBlock(i, j) {
+    let success = true;
+
+    if (getDirectionBlock(i, j, DIR_DOWN) === AIR_BLOCK) {
+      moveBlock(i, j, DIR_DOWN);
+    } else if (getDirectionBlock(i, j, DIR_BOTTOM_RIGHT) === AIR_BLOCK &&
+      getDirectionBlock(i, j, DIR_RIGHT) === AIR_BLOCK) {
+      moveBlock(i, j, DIR_BOTTOM_RIGHT);
+    } else if (getDirectionBlock(i, j, DIR_BOTTOM_LEFT) === AIR_BLOCK &&
+      getDirectionBlock(i, j, DIR_LEFT) === AIR_BLOCK) {
+      moveBlock(i, j, DIR_BOTTOM_LEFT);
+    } else {
+      success = false;
+    }
+
+    return success;
+  }
+
+  function topSliceIsEmpty(x, y) {
+    return grid[x][y-1] === AIR_BLOCK && grid[x-1][y-1] === AIR_BLOCK && grid[x+1][y-1] === AIR_BLOCK;
+  }
+
   function updateLoop() {
     const gridCopy = JSON.parse(JSON.stringify(grid));
 
@@ -198,14 +224,7 @@ window.addEventListener('load', function() {
       for (let j = 0; j < gameHeight; j++) {
         switch (gridCopy[i][j]) {
           case SAND_BLOCK:
-            if (getDirectionBlock(i, j, DIR_DOWN) === AIR_BLOCK) {
-              moveBlock(i, j, DIR_DOWN);
-            } else if (getDirectionBlock(i, j, DIR_BOTTOM_RIGHT) === AIR_BLOCK &&
-              getDirectionBlock(i, j, DIR_RIGHT) === AIR_BLOCK) {
-              moveBlock(i, j, DIR_BOTTOM_RIGHT);
-            } else if (getDirectionBlock(i, j, DIR_BOTTOM_LEFT) === AIR_BLOCK &&
-              getDirectionBlock(i, j, DIR_LEFT) === AIR_BLOCK) {
-              moveBlock(i, j, DIR_BOTTOM_LEFT);
+            if (updateGravityBlock(i, j)) {
             } else if (getDirectionBlock(i, j, DIR_DOWN) === WATER_BLOCK) {
               swapBlock(i, j, DIR_DOWN);
             } else if (getDirectionBlock(i, j, DIR_BOTTOM_RIGHT) === WATER_BLOCK &&
@@ -217,23 +236,27 @@ window.addEventListener('load', function() {
             }
             break;
           case WATER_BLOCK:
-            if (getDirectionBlock(i, j, DIR_DOWN) === AIR_BLOCK) {
-              moveBlock(i, j, DIR_DOWN);
-            } else if (getDirectionBlock(i, j, DIR_BOTTOM_RIGHT) === AIR_BLOCK &&
-              getDirectionBlock(i, j, DIR_RIGHT) === AIR_BLOCK) {
-              moveBlock(i, j, DIR_BOTTOM_RIGHT);
-            } else if (getDirectionBlock(i, j, DIR_BOTTOM_LEFT) === AIR_BLOCK &&
-              getDirectionBlock(i, j, DIR_LEFT) === AIR_BLOCK) {
-              moveBlock(i, j, DIR_BOTTOM_LEFT);
-            } else if (getDirectionBlock(i, j, DIR_BOTTOM_RIGHT) === AIR_BLOCK &&
-              getDirectionBlock(i, j, DIR_RIGHT) === AIR_BLOCK) {
-              moveBlock(i, j, DIR_LEFT);
+            if (updateGravityBlock(i, j)) {
             } else if (hasCliffOnRight(i, j)) {
               moveBlock(i, j, DIR_RIGHT);
             } else if (hasCliffOnLeft(i, j)) {
               moveBlock(i, j, DIR_LEFT);
             }
             break;
+          case SEED_BLOCK:
+            if (updateGravityBlock(i, j)) {
+            } else if (getDirectionBlock(i, j, DIR_UP) === AIR_BLOCK && Math.random() < 0.001) {
+              setBlock(i, j-1, GRASS_BLOCK);
+            }
+            break;
+          case GRASS_BLOCK:
+            if (Math.random() < 0.001 && topSliceIsEmpty(i, j)) {
+              setBlock(i, j-1, GRASS_BLOCK);
+            } else if (topSliceIsEmpty(i,j) && Math.random() < 0.001) {
+              setBlock(i+1, j-1, GRASS_BLOCK);
+            } else if (topSliceIsEmpty(i,j) && Math.random() < 0.001) {
+              setBlock(i-1, j-1, GRASS_BLOCK);
+            }
           default:
             break;
         }
