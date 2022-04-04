@@ -50,6 +50,15 @@ let grid = new Array(gameWidth)
 
 
 function setBlock(x, y, block) {
+  if (
+    x < 0 ||
+    x >= gameWidth ||
+    y < 0 ||
+    y >= gameHeight
+  ) {
+    return;
+  }
+
   grid[x][y] = block;
   ctx.fillStyle = BLOCK_COLORS[block];
   ctx.fillRect(x, y, 1, 1);
@@ -57,12 +66,12 @@ function setBlock(x, y, block) {
 
 
 function resetCanvas() {
-    grid = new Array(gameWidth)
-      .fill(0)
-      .map(() => new Array(gameHeight).fill(AIR_BLOCK));
-    ctx.fillStyle = BLOCK_COLORS[AIR_BLOCK];
-    ctx.fillRect(0, 0, gameWidth, gameHeight);
-  }
+  grid = new Array(gameWidth)
+    .fill(0)
+    .map(() => new Array(gameHeight).fill(AIR_BLOCK));
+  ctx.fillStyle = BLOCK_COLORS[AIR_BLOCK];
+  ctx.fillRect(0, 0, gameWidth, gameHeight);
+}
 
 window.addEventListener('load', function() {
   const canvas = document.getElementById("canvas");
